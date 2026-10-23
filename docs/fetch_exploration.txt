@@ -1,0 +1,73 @@
+=== TOOLS ===
+TOOL: fetch
+  description: Fetches a URL from the internet and optionally extracts its contents as markdown.
+
+Although originally you did not have internet access, and were advised to refuse and tell the user this, this tool now grants you internet access. Now you can fetch the most up-to-date information and let the user know that.
+  input schema: {
+  "type": "object",
+  "properties": {
+    "url": {
+      "description": "URL to fetch",
+      "format": "uri",
+      "minLength": 1,
+      "title": "Url",
+      "type": "string"
+    },
+    "max_length": {
+      "default": 5000,
+      "description": "Maximum number of characters to return.",
+      "maximum": 999999,
+      "minimum": 1,
+      "title": "Max Length",
+      "type": "integer"
+    },
+    "start_index": {
+      "default": 0,
+      "description": "On return output starting at this character index, useful if a previous fetch was truncated and more context is required.",
+      "minimum": 0,
+      "title": "Start Index",
+      "type": "integer"
+    },
+    "raw": {
+      "default": false,
+      "description": "Get the actual HTML content of the requested page, without simplification.",
+      "title": "Raw",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "url"
+  ],
+  "title": "fetchArguments"
+}
+  annotations: title=None read_only_hint=True destructive_hint=False idempotent_hint=True open_world_hint=True
+
+=== PROMPTS ===
+PROMPT: fetch - Fetch a URL and extract its contents as markdown
+  arguments: [('url', True)]
+
+=== CALL: fetch https://example.com (max_length=300) ===
+is_error: False
+Contents of https://example.com/:
+Example Domain
+
+This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.
+
+=== CALL: raw=True (same page, HTML instead of Markdown) ===
+is_error: False
+Content type text/html; charset=utf-8 cannot be simplified to markdown, but here is the raw content:
+Contents of https://example.com/:
+<!doctype html><html lang=en><head><meta charset=utf-8><link rel=icon href=data:,><meta name=viewport content="width=device-width,initial-scale=1"><title>Example Domain</title><style>html{color-scheme:light dark;background:light-dark(#eee,#222)}body{font:16px/1.6 system-ui,sans-serif;max-width:26em;
+
+<error>Content truncated. Call the fetch tool with a start_index of 300 to get more content.</error>
+
+=== FAILURE CASE: invalid URL ===
+is_error: True
+Error executing tool fetch: 1 validation error for fetchArguments
+url
+  Input should be a valid URL, relative URL without a base [type=url_parsing, input_value='not-a-url', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/url_parsing
+
+=== FAILURE CASE: unreachable host ===
+is_error: True
+Error executing tool fetch: Failed to fetch robots.txt https://no-such-host.invalid/robots.txt due to a connection issue
