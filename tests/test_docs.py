@@ -33,3 +33,13 @@ def test_summary_names_architecture_roles(summary_text, term):
 @pytest.mark.parametrize("principle", ["well-defined interface", "isolated functionality", "predictable behaviour"])
 def test_summary_names_class_principles(summary_text, principle):
     assert principle in summary_text.lower().replace("behavior", "behaviour")
+
+
+def test_reflection_is_one_or_two_paragraphs_of_250_to_350_words():
+    path = ROOT / "docs" / "reflection.md"
+    if not path.exists():
+        pytest.skip("docs/reflection.md not written yet")
+    body = path.read_text(encoding="utf-8").split("\n", 1)[1]  # drop the title line
+    paragraphs = [p for p in body.split("\n\n") if p.strip()]
+    assert 1 <= len(paragraphs) <= 2
+    assert 250 <= count_words(body) <= 350
