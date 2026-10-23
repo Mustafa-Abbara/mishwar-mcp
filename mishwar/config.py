@@ -37,3 +37,24 @@ def simulate_outage() -> bool:
 def offline() -> bool:
     """MISHWAR_OFFLINE=1 answers weather calls from saved responses (demo-day safety net)."""
     return _flag("MISHWAR_OFFLINE")
+
+
+def transport() -> str:
+    """'stdio' (development: the host starts the server) or 'http' (demo: the server runs in its own terminal)."""
+    value = os.getenv("MCP_TRANSPORT", "stdio").split("#")[0].strip().lower()
+    return "http" if value in {"http", "streamable-http"} else "stdio"
+
+
+def http_url() -> str:
+    return os.getenv("MCP_HTTP_URL", "http://127.0.0.1:8000/mcp").split("#")[0].strip()
+
+
+def server_env() -> dict[str, str]:
+    """Settings to hand to a stdio server process.
+
+    The MCP stdio client gives the child only a minimal environment (PATH,
+    TEMP, ...), so without this a shell override such as
+    MISHWAR_SIMULATE_OUTAGE=1 would silently not reach the server.
+    """
+    keep = ("MISHWAR_", "MCP_", "PYTHON")
+    return {k: v for k, v in os.environ.items() if k.startswith(keep)}

@@ -300,3 +300,10 @@ async def test_plan_rejects_unknown_activity_before_any_call(fake_api):
     with pytest.raises(InvalidInput, match="not a supported activity"):
         await planner.plan_day_trip("Byblos", TOMORROW, "skiing")
     assert fake_api.calls == []
+
+
+def test_server_env_forwards_settings_to_stdio_child(monkeypatch):
+    from mishwar import config
+    monkeypatch.setenv("MISHWAR_SIMULATE_OUTAGE", "1")
+    env = config.server_env()
+    assert env["MISHWAR_SIMULATE_OUTAGE"] == "1" and "MISHWAR_DATA_DIR" in env

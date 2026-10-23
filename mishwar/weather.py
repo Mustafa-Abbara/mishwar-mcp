@@ -143,7 +143,7 @@ async def get_forecast(place: str, date: str) -> DayForecast:
 
 def _offline_json(url: str, params: dict) -> dict:
     """Answer from saved responses in offline_data/. Logged on every call so it is never hidden."""
-    log.warning("[SERVER] OFFLINE MODE: answering %s from saved responses", url.rsplit("/", 1)[-1])
+    log.warning("OFFLINE MODE: answering %s from saved responses", url.rsplit("/", 1)[-1])
     if url == GEOCODE_URL:
         path = OFFLINE_DIR / "geocode" / f"{params['name'].strip().lower()}.json"
         return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
