@@ -19,18 +19,19 @@ from agents.mcp import MCPServer, MCPServerStdio, MCPServerStreamableHttp
 from mishwar import config
 from mishwar.validation import today_beirut
 
-from .llm import build_model, model_name
+from .llm import build_model, model_name, model_settings
 
 MAX_PLANS_IN_PROMPT = 20
 
 
-def make_mcp_client(transport: str | None = None) -> MCPServer:
-    """The MCP client: one dedicated connection to one server."""
+def make_mcp_client(transport: str | None = None, tool_filter=None) -> MCPServer:
+    """The MCP client: one dedicated connection to one server. tool_filter can hide tools (evaluation only)."""
     if (transport or config.transport()) == "http":
         return MCPServerStreamableHttp(
             name="mishwar",
             params={"url": config.http_url(), "timeout": 30},
             cache_tools_list=True,
+            tool_filter=tool_filter,
             client_session_timeout_seconds=30,  # the SDK default of 5 s is shorter than a slow weather call
         )
     return MCPServerStdio(
@@ -42,6 +43,7 @@ def make_mcp_client(transport: str | None = None) -> MCPServer:
             "env": config.server_env(),  # merged over the minimal default env, so MISHWAR_* overrides arrive
         },
         cache_tools_list=True,
+        tool_filter=tool_filter,
         client_session_timeout_seconds=30,
     )
 
@@ -57,7 +59,15 @@ def format_plans(plans: list[dict]) -> str:
     return "\n".join(f"- {p['plan_id']}: {p['title']} | {p['place']} | {p['date']} | {p['activity']}" for p in plans)
 
 
-def build_agent(server: MCPServer) -> Agent:
+PLAN_RULE = """3. The user wants you to judge whether a trip is a good idea, or to plan it -> call plan_day_trip
+   (do NOT call the other two separately for this; plan_day_trip already does both)."""
+
+# Evaluation only (scripts/eval_routing.py --chaining): plan_day_trip is hidden and the model must chain.
+CHAINING_PLAN_RULE = """3. The user wants you to judge whether a trip is a good idea, or to plan it -> first call
+   get_weather_forecast, judge the forecast for the activity yourself, then call save_trip_plan only if the trip is a good idea."""
+
+
+def build_agent(server: MCPServer, plan_rule: str = PLAN_RULE) -> Agent:
     async def instructions(ctx, agent) -> str:
         # Rebuilt on every run: today's date stays correct, and the saved plans
         # come from the trips://plans resource (app-controlled context, not a tool).
@@ -68,8 +78,7 @@ def build_agent(server: MCPServer) -> Agent:
 Choose tools like this:
 1. The user only asks about the weather -> call get_weather_forecast.
 2. The user has already decided on a trip and asks to save or remember it -> call save_trip_plan.
-3. The user wants you to judge whether a trip is a good idea, or to plan it -> call plan_day_trip
-   (do NOT call the other two separately for this; plan_day_trip already does both).
+{plan_rule}
 4. Questions about the user's saved plans -> answer from the list below; no tool is needed.
 5. Anything else -> answer briefly without tools.
 
@@ -82,7 +91,8 @@ Rules:
 Saved plans (newest first, from trips://plans):
 {format_plans(plans)}"""
 
-    return Agent(name="Mishwar", instructions=instructions, model=build_model(), mcp_servers=[server])
+    return Agent(name="Mishwar", instructions=instructions, model=build_model(), model_settings=model_settings(),
+                 mcp_servers=[server])
 
 
 class RoundTrip(RunHooks):
@@ -94,9 +104,7 @@ class RoundTrip(RunHooks):
 
     async def on_tool_end(self, context, agent, tool, result):
         # The SDK hands MCP output over as {"type": "text", "text": ...} items; show just the text.
-        items = result if isinstance(result, list) else [result]
-        raw = " ".join(i.get("text", str(i)) if isinstance(i, dict) else str(i) for i in items)
-        text = " ".join(raw.split())
+        text = " ".join(_output_text(result).split())
         print(f"  [CLIENT -> HOST] '{tool.name}' returned: {text[:200]}{'...' if len(text) > 200 else ''}")
 
 
@@ -104,14 +112,25 @@ class RoundTrip(RunHooks):
 class Turn:
     answer: str
     tools_called: list[str] = field(default_factory=list)
+    tool_arguments: list[str] = field(default_factory=list)
+    tool_outputs: list[str] = field(default_factory=list)
+    llm_calls: int = 0
 
 
 async def ask(agent: Agent, history: list, text: str, verbose: bool = True) -> tuple[Turn, list]:
     """Run one user turn. Returns the answer, the tools called, and the new history."""
     result = await Runner.run(agent, history + [{"role": "user", "content": text}],
                               hooks=RoundTrip() if verbose else None, max_turns=8)
-    tools = [item.raw_item.name for item in result.new_items if item.type == "tool_call_item"]
-    return Turn(str(result.final_output), tools), result.to_input_list()
+    calls = [item.raw_item for item in result.new_items if item.type == "tool_call_item"]
+    outputs = [_output_text(item.output) for item in result.new_items if item.type == "tool_call_output_item"]
+    turn = Turn(str(result.final_output), [c.name for c in calls], [c.arguments for c in calls], outputs,
+                len(result.raw_responses))
+    return turn, result.to_input_list()
+
+
+def _output_text(output) -> str:
+    items = output if isinstance(output, list) else [output]
+    return " ".join(i.get("text", str(i)) if isinstance(i, dict) else str(i) for i in items)
 
 
 HELP = "Ask about the weather, save a trip, or ask me to plan one. Commands: /plans, /help, exit."

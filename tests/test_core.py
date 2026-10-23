@@ -108,6 +108,13 @@ async def test_alias_is_tried_when_plain_search_fails(fake_api):
     assert [p["name"] for _, p in fake_api.calls[:2]] == ["Saida", "Sidon"]
 
 
+async def test_leading_article_is_dropped_when_not_found(fake_api):
+    # Found in the Stage 6 evaluation: the model asked for "The Cedars".
+    f = await weather.get_forecast("The Sidon", TOMORROW)
+    assert f.place == "Sidon"
+    assert [p["name"] for _, p in fake_api.calls[:2]] == ["The Sidon", "Sidon"]
+
+
 @pytest.mark.parametrize("place", ["B", " ", "x" * 81])
 async def test_place_length(fake_api, place):
     with pytest.raises(InvalidInput, match="2–80 characters"):

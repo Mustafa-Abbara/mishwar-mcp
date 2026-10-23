@@ -7,6 +7,7 @@ import datetime as dt
 import json
 import logging
 import math
+import re
 from pathlib import Path
 
 import httpx
@@ -101,7 +102,10 @@ async def geocode(place: str) -> dict:
     """Return the geocoder's record for a place in Lebanon, trying the alias table second."""
     name = validation.check_place(place)
     record = await _search(name)
-    alias = ALIASES.get(name.lower())
+    bare = re.sub(r"^the\s+", "", name, flags=re.IGNORECASE)  # models write "The Cedars"; the geocoder knows "Cedars"
+    if record is None and bare != name:
+        record = await _search(bare)
+    alias = ALIASES.get(bare.lower())
     if record is None and alias:
         record = await _search(alias)
     if record is None:
