@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = ["live: needs network and/or an LLM key (run with -m live)"]
+addopts = "-m 'not live'"
