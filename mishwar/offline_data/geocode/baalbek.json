@@ -1,0 +1,20 @@
+{
+ "results": [
+  {
+   "id": 277130,
+   "name": "Baalbek",
+   "latitude": 34.00583,
+   "longitude": 36.21806,
+   "elevation": 1183.0,
+   "feature_code": "PPLA",
+   "country_code": "LB",
+   "admin1_id": 6201371,
+   "timezone": "Asia/Beirut",
+   "population": 30916,
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "Baalbek-Hermel Governorate"
+  }
+ ],
+ "generationtime_ms": 0.14233589
+}

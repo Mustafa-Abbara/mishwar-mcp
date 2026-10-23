@@ -1,0 +1,19 @@
+{
+ "results": [
+  {
+   "id": 273725,
+   "name": "Ehden",
+   "latitude": 34.29111,
+   "longitude": 35.965,
+   "elevation": 1451.0,
+   "feature_code": "PPL",
+   "country_code": "LB",
+   "admin1_id": 278297,
+   "timezone": "Asia/Beirut",
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "North Lebanon"
+  }
+ ],
+ "generationtime_ms": 0.13375282
+}

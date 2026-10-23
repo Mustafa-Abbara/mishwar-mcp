@@ -1,0 +1,22 @@
+{
+ "results": [
+  {
+   "id": 273140,
+   "name": "Jounieh",
+   "latitude": 33.98083,
+   "longitude": 35.61778,
+   "elevation": 40.0,
+   "feature_code": "PPLA2",
+   "country_code": "LB",
+   "admin1_id": 273607,
+   "admin2_id": 10119971,
+   "timezone": "Asia/Beirut",
+   "population": 96315,
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "Mount Lebanon",
+   "admin2": "Keserwan District"
+  }
+ ],
+ "generationtime_ms": 0.15985966
+}

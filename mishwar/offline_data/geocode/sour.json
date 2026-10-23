@@ -1,0 +1,20 @@
+{
+ "results": [
+  {
+   "id": 267008,
+   "name": "Tyre",
+   "latitude": 33.27333,
+   "longitude": 35.19389,
+   "elevation": 7.0,
+   "feature_code": "PPLA2",
+   "country_code": "LB",
+   "admin1_id": 279894,
+   "timezone": "Asia/Beirut",
+   "population": 135204,
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "South Governorate"
+  }
+ ],
+ "generationtime_ms": 0.14543533
+}

@@ -1,0 +1,20 @@
+{
+ "results": [
+  {
+   "id": 266045,
+   "name": "Zahle",
+   "latitude": 33.84675,
+   "longitude": 35.90203,
+   "elevation": 963.0,
+   "feature_code": "PPLA",
+   "country_code": "LB",
+   "admin1_id": 280282,
+   "timezone": "Asia/Beirut",
+   "population": 78145,
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "Bekaa"
+  }
+ ],
+ "generationtime_ms": 0.27871132
+}

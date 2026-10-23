@@ -33,9 +33,11 @@ Resources are read by the **application** (the host), not chosen by the model, s
 | Search "Byblos" (`countryCode=LB`) | 1 result, Mount Lebanon | OK |
 | Search "Jbeil", "Tyre" | Response with **no `results` key** | Local or alternative names often fail, so this needs a small alias table (below) and a helpful `PlaceNotFound` message |
 | Search "Sour", "Saida" | Resolve to Tyre and Sidon | The geocoder knows some local names, but not consistently |
+| Search "Bcharre", "Jeita" (Stage 3) | Not found; "Bsharri" works, Jeita has no entry at all | Spelling variants go in the alias table; Jeita is left out rather than silently mapped to another town |
+| 6 connections in a row (Stage 3) | About 1 in 6 hangs at the connect step | `fetch_json` retries the connection twice (§5) |
 | Forecast for Byblos | `weather_code`, `temperature_2m_max/min`, `precipitation_probability_max`, `wind_speed_10m_max`, units included | These five daily fields are all `DayForecast` needs |
 
-**Alias table (internal to the Data tool):** a short dictionary such as `{"jbeil": "Byblos", "tyre": "Sour", "sur": "Sour", "saida": "Sidon", "trablous": "Tripoli"}` is tried when the plain search finds nothing. The entries are verified by a live test in Stage 3. This is an implementation detail of "look up the forecast for a named place", not a new capability.
+**Alias table (internal to the Data tool):** a short dictionary such as `{"jbeil": "Byblos", "tyre": "Sour", "saida": "Sidon", "trablous": "Tripoli", "bcharre": "Bsharri", …}` is tried when the plain search finds nothing. Every alias target is checked against the real geocoder by `tests/live/test_live_weather.py`. This is an implementation detail of "look up the forecast for a named place", not a new capability.
 
 ---
 
@@ -155,14 +157,19 @@ The rule: **never save a plan whose forecast was not retrieved, and always say p
 | `InvalidInput` (place) | Data, Orch. | `InvalidInput: The place name must be 2–80 characters; got {n}.` |
 | `InvalidInput` (past date) | Action | `InvalidInput: {date} is in the past (today is {today} in Beirut). Choose today or a later date.` |
 | `InvalidInput` (title) | Action | `InvalidInput: The title must be 3–80 characters; got {n}.` |
+| `InvalidInput` (far date) | Action | `InvalidInput: {date} is more than a year ahead. Choose a date up to {today+365}.` |
+| `InvalidInput` (notes) | Action | `InvalidInput: The notes must be at most 500 characters; got {n}.` |
+| `InvalidInput` (activity) | Action, Orch. | `InvalidInput: '{activity}' is not a supported activity. Use one of: hike, beach, sightseeing, indoor.` |
+| `InvalidInput` (API rejected) | Data, Orch. | `InvalidInput: The weather service rejected the request: {reason}.` (should not happen: dates are checked first) |
 | `DateOutOfRange` | Data, Orch. | `DateOutOfRange: {date} is outside the forecast window ({today} to {today+15}). Pick a date in that range.` |
 | `PlaceNotFound` | Data, Orch. | `PlaceNotFound: No place called '{place}' was found in Lebanon. Check the spelling or try the English name of the town or a nearby one, e.g. 'Byblos' or 'Sidon'.` |
 | `ServiceUnavailable` | Data, Orch. | `ServiceUnavailable: The weather service (Open-Meteo) did not respond ({reason}). Nothing was saved. Try again in a minute.` |
 | `DuplicatePlan` | Action | `DuplicatePlan: A plan titled '{title}' on {date} already exists ({plan_id}). Use a different title or date.` |
 | `StorageError` | Action | `StorageError: Could not write the saved plans ({reason}). The plan was NOT saved.` |
+| `StorageError` (read) | Action, resource | `StorageError: Could not read the saved plans ({reason}). Fix or remove data/plans.json.` |
 | `PlanNotFound` | resource | `PlanNotFound: No saved plan has id '{plan_id}'. Read trips://plans to see the saved ids.` (raised as `ResourceError`) |
 
-`{reason}` is short and fixed: `timeout after 10 s`, `HTTP 503`, `network error`, or `simulated outage`.
+`{reason}` is short and fixed: `timed out`, `HTTP 503`, `network error`, `unexpected response`, or `simulated outage`. Connection attempts are retried twice (4 s each) before giving up, because on some networks about one connection in six hangs; the worst case (~22 s) stays under the host's 30 s MCP timeout.
 
 ---
 

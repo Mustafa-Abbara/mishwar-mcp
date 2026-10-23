@@ -1,0 +1,18 @@
+{
+ "results": [
+  {
+   "id": 11048906,
+   "name": "Cedars",
+   "latitude": 34.24438,
+   "longitude": 36.04064,
+   "feature_code": "PPL",
+   "country_code": "LB",
+   "admin1_id": 278297,
+   "timezone": "Asia/Beirut",
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "North Lebanon"
+  }
+ ],
+ "generationtime_ms": 0.18692017
+}

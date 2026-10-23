@@ -1,0 +1,20 @@
+{
+ "results": [
+  {
+   "id": 276781,
+   "name": "Beirut",
+   "latitude": 33.89332,
+   "longitude": 35.50157,
+   "elevation": 40.0,
+   "feature_code": "PPLC",
+   "country_code": "LB",
+   "admin1_id": 276780,
+   "timezone": "Asia/Beirut",
+   "population": 1916100,
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "Beirut"
+  }
+ ],
+ "generationtime_ms": 0.22149086
+}

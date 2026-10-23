@@ -1,0 +1,20 @@
+{
+ "results": [
+  {
+   "id": 276359,
+   "name": "Bsharri",
+   "latitude": 34.25083,
+   "longitude": 36.01056,
+   "elevation": 1442.0,
+   "feature_code": "PPLA2",
+   "country_code": "LB",
+   "admin1_id": 278297,
+   "timezone": "Asia/Beirut",
+   "population": 20000,
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "North Lebanon"
+  }
+ ],
+ "generationtime_ms": 0.121593475
+}

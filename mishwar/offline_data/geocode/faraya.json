@@ -1,0 +1,19 @@
+{
+ "results": [
+  {
+   "id": 275308,
+   "name": "Faraya",
+   "latitude": 34.01611,
+   "longitude": 35.82139,
+   "elevation": 1313.0,
+   "feature_code": "PPL",
+   "country_code": "LB",
+   "admin1_id": 273607,
+   "timezone": "Asia/Beirut",
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "Mount Lebanon"
+  }
+ ],
+ "generationtime_ms": 0.14340878
+}

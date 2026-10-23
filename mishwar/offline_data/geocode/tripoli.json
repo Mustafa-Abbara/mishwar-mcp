@@ -1,0 +1,20 @@
+{
+ "results": [
+  {
+   "id": 266826,
+   "name": "Tripoli",
+   "latitude": 34.43352,
+   "longitude": 35.84415,
+   "elevation": 51.0,
+   "feature_code": "PPLA",
+   "country_code": "LB",
+   "admin1_id": 278297,
+   "timezone": "Asia/Beirut",
+   "population": 229398,
+   "country_id": 272103,
+   "country": "Lebanon",
+   "admin1": "North Lebanon"
+  }
+ ],
+ "generationtime_ms": 0.15974045
+}
