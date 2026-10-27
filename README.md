@@ -2,7 +2,7 @@
 
 *Mishwar* (مشوار) is Lebanese for an outing. Ask the agent about the weather, save a trip, or let it decide whether a trip is a good idea and plan it. It is an MCP server built with **FastMCP** and an agent built with the **OpenAI Agents SDK** acting as the MCP host and client. EECE 503P/798S, Assignment C5.
 
-- 🎬 **Screencast:** *link added after recording (Stage 8)*
+- 🎬 **Screencast (YouTube, unlisted):** https://www.youtube.com/watch?v=lLg_9rvZXSA
 - 📝 **Part 1 summary (MCP + Fetch server critique):** [docs/summary.md](docs/summary.md)
 - 💭 **Reflection:** [docs/reflection.md](docs/reflection.md)
 - 🧭 **Tool design:** [docs/tool_design.md](docs/tool_design.md) · **Challenges:** [docs/challenges.md](docs/challenges.md) · **Architecture:** [docs/architecture.md](docs/architecture.md)
